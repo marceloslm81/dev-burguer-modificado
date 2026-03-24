@@ -6,15 +6,20 @@ import { User, ViewState, Product } from '../types';
 interface MenuScreenProps {
   user: User;
   category: string;
+  categories: string[];
   onNavigate: (view: ViewState) => void;
   onLogout: () => void;
+  onSelectCategory: (categoryName: string) => void;
   onBack: () => void;
   onAddToCart: (product: Product) => void;
+  favoriteIds: number[];
+  onToggleFavorite: (productId: number) => void;
   products: Product[];
 }
 
-export const MenuScreen: React.FC<MenuScreenProps> = ({ user, category, onNavigate, onLogout, onBack, onAddToCart, products: allProducts }) => {
-  const products = allProducts.filter(p => p.category === category);
+export const MenuScreen: React.FC<MenuScreenProps> = ({ user, category, categories, onNavigate, onLogout, onSelectCategory, onBack, onAddToCart, favoriteIds, onToggleFavorite, products: allProducts }) => {
+  const activeCategory = category || categories[0] || '';
+  const products = allProducts.filter(p => p.category === activeCategory);
   
   const titleColor = 'text-[#78ab26]'; 
   
@@ -42,11 +47,22 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ user, category, onNaviga
       </div>
 
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 pb-20">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {categories.map((item) => (
+            <button
+              key={item}
+              onClick={() => onSelectCategory(item)}
+              className={`px-5 py-2 rounded-full border text-sm font-semibold transition-colors ${activeCategory === item ? 'bg-[#9758a6] text-white border-[#9758a6]' : 'bg-white text-[#9758a6] border-[#9758a6] hover:bg-[#f6ebfa]'}`}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
         
         {/* Section Title */}
         <div className="mt-10 mb-28 text-center relative">
             <h2 className={`text-2xl md:text-3xl font-extrabold ${titleColor} uppercase tracking-wide inline-block relative`}>
-                {category === 'Hamburgueres' ? 'Hamburgúeres - Cardápio' : `Cardápio - ${category}`}
+                {activeCategory === 'Hamburgueres' ? 'Hamburgúeres - Cardápio' : `Cardápio - ${activeCategory}`}
                 <span className={`absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-10 h-1 bg-[#9758a6] rounded-full`}></span>
             </h2>
         </div>
@@ -56,8 +72,11 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ user, category, onNaviga
             {products.map((product) => (
                 <div key={product.id} className="bg-white rounded-3xl pt-24 px-6 pb-6 relative shadow-md hover:shadow-xl transition-all duration-300 flex flex-col">
                     {/* Heart Icon */}
-                    <button className="absolute top-5 right-5 text-[#9758a6] hover:text-[#7a4687] transition-colors z-10">
-                        <Heart size={24} />
+                    <button
+                        onClick={() => onToggleFavorite(product.id)}
+                        className={`absolute top-5 right-5 transition-colors z-10 ${favoriteIds.includes(product.id) ? 'text-[#ff4d6d]' : 'text-[#9758a6] hover:text-[#7a4687]'}`}
+                    >
+                        <Heart size={24} fill={favoriteIds.includes(product.id) ? 'currentColor' : 'none'} />
                     </button>
 
                     {/* Floating Image Above Card */}
@@ -81,9 +100,20 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ user, category, onNaviga
 
                         <div className="mt-auto flex justify-between items-end">
                             <div className="flex flex-col">
-                                <span className="text-gray-900 font-extrabold text-2xl">
-                                    {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                </span>
+                                {product.discount ? (
+                                    <>
+                                        <span className="text-gray-400 font-bold text-xl line-through">
+                                            {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        </span>
+                                        <span className="text-[#ff4d6d] font-extrabold text-2xl">
+                                            {(product.price * (1 - product.discount / 100)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-gray-900 font-extrabold text-2xl">
+                                        {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </span>
+                                )}
                                  {product.rating && product.rating > 0 ? (
                                     <div className="flex items-center gap-2 mt-1">
                                         <div className="flex gap-0.5">

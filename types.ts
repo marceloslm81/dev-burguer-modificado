@@ -21,6 +21,7 @@ export interface Product {
   category: string;
   description?: string;
   rating?: number;
+  discount?: number;
 }
 
 export interface CartItem extends Product {

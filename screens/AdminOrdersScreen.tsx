@@ -20,7 +20,7 @@ export const AdminOrdersScreen: React.FC<AdminOrdersScreenProps> = ({ user, orde
   });
 
   return (
-    <div className="min-h-screen bg-[#111] text-white flex">
+    <div className="min-h-screen bg-gray-100 pattern-bg text-white flex">
       <div className="w-64 bg-[#1f1f1f] flex flex-col">
         <div className="px-6 py-6"><img src="/Logo 1.png" alt="Dev Burguer" className="w-28 h-28 object-contain mx-auto" /></div>
         <button className="text-left px-6 py-3 bg-[#9758a6]">Pedidos</button>
@@ -32,7 +32,7 @@ export const AdminOrdersScreen: React.FC<AdminOrdersScreenProps> = ({ user, orde
         <div className="bg-[#5c2e6b] text-center text-xs py-3">Desenvolvido por DevClub - 2025 - Todos os direitos reservados</div>
       </div>
 
-      <div className="flex-1 bg-gray-200 p-6">
+      <div className="flex-1 p-6">
         <div className="bg-white rounded-2xl p-6">
           <div className="text-gray-500 text-sm mb-6">Gerenciar &gt; Pedidos</div>
           <div className="flex gap-4 mb-6">

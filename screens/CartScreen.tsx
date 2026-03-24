@@ -25,8 +25,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({ user, cart, onNavigate, 
       <div className="relative h-[200px] w-full bg-[#111] overflow-hidden flex items-center justify-center">
           <div className="absolute inset-0 opacity-100 bg-[url('/fundo.jpg')] bg-cover bg-center"></div>
           <div className="z-10 text-center">
-             {/* Logo would go here if needed, keeping simple like others */}
-             <h1 className="font-display text-white text-4xl md:text-5xl drop-shadow-lg">Dev <span className="text-[#9758a6]">Burguer</span></h1>
+             <img src="/Logo 1.png" alt="Dev Burguer" className="w-24 md:w-32 h-auto mx-auto drop-shadow-lg" />
           </div>
       </div>
 

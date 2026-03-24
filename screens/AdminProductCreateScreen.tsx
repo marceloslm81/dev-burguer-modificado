@@ -17,6 +17,8 @@ export const AdminProductCreateScreen: React.FC<AdminProductCreateScreenProps> =
   const [category, setCategory] = useState<number>(CATEGORIES[0]?.id || 1);
   const [fileName, setFileName] = useState('');
   const [image, setImage] = useState<string>('');
+  const [isOffer, setIsOffer] = useState(false);
+  const [discount, setDiscount] = useState('');
 
   useEffect(() => {
     if (productToEdit) {
@@ -25,6 +27,8 @@ export const AdminProductCreateScreen: React.FC<AdminProductCreateScreenProps> =
       const cat = CATEGORIES.find(c => c.name === productToEdit.category)?.id || CATEGORIES[0].id;
       setCategory(cat);
       setImage(productToEdit.image);
+      setIsOffer(!!productToEdit.discount);
+      setDiscount(productToEdit.discount ? String(productToEdit.discount) : '');
     }
   }, [productToEdit]);
 
@@ -37,14 +41,15 @@ export const AdminProductCreateScreen: React.FC<AdminProductCreateScreenProps> =
       image: image || productToEdit?.image || '/burguer1.png',
       category: catName,
       description: productToEdit?.description,
-      rating: productToEdit?.rating || 5
+      rating: productToEdit?.rating || 5,
+      discount: isOffer && discount ? Number(discount) : undefined
     };
     onSaveProduct(updated);
     onNavigate(ViewState.ADMIN_PRODUCTS_LIST);
   };
 
   return (
-    <div className="min-h-screen bg-[#111] text-white flex">
+    <div className="min-h-screen bg-gray-100 pattern-bg text-white flex">
       <div className="w-64 bg-[#1f1f1f] flex flex-col">
         <div className="px-6 py-6"><img src="/Logo 1.png" alt="Dev Burguer" className="w-28 h-28 object-contain mx-auto" /></div>
         <button onClick={() => onNavigate(ViewState.ADMIN_ORDERS)} className="text-left px-6 py-3">Pedidos</button>
@@ -56,7 +61,7 @@ export const AdminProductCreateScreen: React.FC<AdminProductCreateScreenProps> =
         <div className="bg-[#5c2e6b] text-center text-xs py-3">Desenvolvido por Dvelloper - 2025 - Todos os direitos reservados</div>
       </div>
 
-      <div className="flex-1 bg-gray-200 p-6">
+      <div className="flex-1 p-6">
         <div className="bg-white rounded-2xl p-6">
           <div className="text-gray-500 text-sm mb-6">Gerenciar &gt; Cadastrar produto</div>
           <div className="max-w-md mx-auto bg-[#2b2b2b] rounded-xl p-6 text-white shadow">
@@ -84,6 +89,31 @@ export const AdminProductCreateScreen: React.FC<AdminProductCreateScreenProps> =
                 ))}
               </select>
             </div>
+            <div className="mb-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isOffer} 
+                  onChange={(e) => setIsOffer(e.target.checked)}
+                  className="w-4 h-4 accent-[#9758a6]" 
+                />
+                <span className="text-sm">Produto em oferta</span>
+              </label>
+            </div>
+            {isOffer && (
+              <div className="mb-4">
+                <label className="block text-sm mb-1">Desconto (%)</label>
+                <input 
+                  type="number" 
+                  value={discount} 
+                  onChange={(e)=>setDiscount(e.target.value)}
+                  min="0" 
+                  max="100" 
+                  className="w-full rounded-lg border border-gray-600 bg-[#1f1f1f] px-3 py-2" 
+                  placeholder="Ex: 20"
+                />
+              </div>
+            )}
             <button onClick={submit} className="w-full py-3 rounded-lg font-bold text-white bg-[#9758a6]">Adicionar produto</button>
           </div>
         </div>

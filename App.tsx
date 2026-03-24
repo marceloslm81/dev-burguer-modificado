@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ViewState, User, CartItem, Product, Order } from './types';
 import { LoginScreen } from './screens/LoginScreen';
 import { RegisterScreen } from './screens/RegisterScreen';
@@ -24,11 +24,25 @@ const App: React.FC = () => {
   const [showAdminModal, setShowAdminModal] = useState<boolean>(false);
   const [adminEmailInput, setAdminEmailInput] = useState<string>('');
   const [requestedAdminView, setRequestedAdminView] = useState<ViewState | null>(null);
-  const ADMIN_EMAIL = 'mcs.marcelo81@gmail.com';
+  const ADMIN_EMAIL = 'admin@teste.com';
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
   const [offerMap, setOfferMap] = useState<Record<number, boolean>>({});
   const offers = products.filter(p => !!offerMap[p.id]);
+  const categoryOptions = Array.from(new Set(products.map((product) => product.category)));
+  const [favoriteIds, setFavoriteIds] = useState<number[]>(() => {
+    const saved = localStorage.getItem('dev-burguer-favorites');
+    if (!saved) return [];
+    try {
+      return JSON.parse(saved) as number[];
+    } catch {
+      return [];
+    }
+  });
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('dev-burguer-favorites', JSON.stringify(favoriteIds));
+  }, [favoriteIds]);
 
   const handleLogin = (email: string) => {
     const name = email.split('@')[0];
@@ -45,6 +59,12 @@ const App: React.FC = () => {
   const handleSelectCategory = (categoryName: string) => {
       setSelectedCategory(categoryName);
       setCurrentView(ViewState.MENU);
+  };
+
+  const handleToggleFavorite = (productId: number) => {
+    setFavoriteIds((prev) => prev.includes(productId)
+      ? prev.filter((id) => id !== productId)
+      : [...prev, productId]);
   };
 
   const addToCart = (product: Product) => {
@@ -136,6 +156,8 @@ const App: React.FC = () => {
                 onSelectCategory={handleSelectCategory} 
                 onLogout={handleLogout} 
                 onAddToCart={addToCart}
+                favoriteIds={favoriteIds}
+                onToggleFavorite={handleToggleFavorite}
                 offers={offers.length > 0 ? offers : products.slice(0,4)}
             />
         );
@@ -145,10 +167,14 @@ const App: React.FC = () => {
             <MenuScreen 
                 user={user}
                 category={selectedCategory}
+                categories={categoryOptions}
                 onNavigate={navigate}
                 onLogout={handleLogout}
+                onSelectCategory={handleSelectCategory}
                 onBack={() => setCurrentView(ViewState.HOME)}
                 onAddToCart={addToCart}
+                favoriteIds={favoriteIds}
+                onToggleFavorite={handleToggleFavorite}
                 products={products}
             />
         );
@@ -220,6 +246,12 @@ const App: React.FC = () => {
                 const exists = prev.some(x => x.id === p.id);
                 return exists ? prev.map(x => x.id === p.id ? p : x) : [...prev, p];
               });
+              
+              // Se o produto tem desconto, marca automaticamente como oferta
+              if (p.discount) {
+                setOfferMap(prev => ({...prev, [p.id]: true}));
+              }
+              
               setEditingProduct(null);
             }}
           />;
